@@ -41,7 +41,7 @@ export function WorkspaceSidebar() {
   const isExpanded = items.some((i) => isActive(i.url));
 
   return (
-    <Sidebar className={state === "collapsed" ? "w-14" : "w-60"} collapsible>
+    <Sidebar className={state === "collapsed" ? "w-14" : "w-60"} collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Workspace</SidebarGroupLabel>
