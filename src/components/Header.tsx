@@ -19,8 +19,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,21 +38,29 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Button variant="ghost" className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              className="flex items-center space-x-2"
+              onClick={() => navigate('/workspace/deploy')}
+            >
               <Cloud className="w-4 h-4" />
               <span>Deploy</span>
             </Button>
-            <Button variant="ghost" className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              className="flex items-center space-x-2"
+              onClick={() => navigate('/workspace/monitor')}
+            >
               <Monitor className="w-4 h-4" />
               <span>Monitor</span>
             </Button>
-            <Button variant="ghost" className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              className="flex items-center space-x-2"
+              onClick={() => navigate('/workspace/history')}
+            >
               <History className="w-4 h-4" />
               <span>History</span>
-            </Button>
-            <Button variant="ghost" className="flex items-center space-x-2">
-              <CreditCard className="w-4 h-4" />
-              <span>Billing</span>
             </Button>
             <Button variant="ghost" className="flex items-center space-x-2">
               <Settings className="w-4 h-4" />
@@ -77,6 +88,10 @@ const Header = () => {
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
                 Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/workspace/settings')}>
+                <CreditCard className="mr-2 h-4 w-4" />
+                Billing & Subscription
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
