@@ -1,7 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cloud, Plus, Settings, Zap, Database, CheckCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Cloud, Plus, Settings, Zap, Database, CheckCircle, Play, Sparkles, Clock } from 'lucide-react';
 import { RAGConfigPreview } from './RAGConfigPreview';
 import { DeploymentProgress } from './DeploymentProgress';
 
@@ -10,6 +13,8 @@ type DeploymentStep = 'configure' | 'preview' | 'deploying' | 'completed';
 export function DeploymentDashboard() {
   const [currentStep, setCurrentStep] = useState<DeploymentStep>('configure');
   const [selectedProvider, setSelectedProvider] = useState<string>('');
+  const [prompt, setPrompt] = useState("Deploy a high-performance Ubuntu 22.04 server with 16GB RAM, GPU support for ML workloads, and Docker pre-installed across AWS and Azure in US-East regions");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [config, setConfig] = useState({
     os: 'Ubuntu 22.04 LTS',
     cpu: '8 cores',
@@ -17,6 +22,15 @@ export function DeploymentDashboard() {
     storage: '100GB SSD',
     region: 'US-East-1'
   });
+
+  const handleAIDeploy = () => {
+    console.log('Starting AI analysis of prompt:', prompt);
+    setIsAnalyzing(true);
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setCurrentStep('preview');
+    }, 2000);
+  };
 
   const handleQuickDeploy = (provider: string) => {
     console.log(`Quick deploying to ${provider}`);
@@ -41,6 +55,7 @@ export function DeploymentDashboard() {
   const handleNewDeployment = () => {
     setCurrentStep('configure');
     setSelectedProvider('');
+    setPrompt("Deploy a high-performance Ubuntu 22.04 server with 16GB RAM, GPU support for ML workloads, and Docker pre-installed across AWS and Azure in US-East regions");
   };
 
   if (currentStep === 'preview') {
@@ -119,13 +134,62 @@ export function DeploymentDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight">Deploy</h2>
+        <h2 className="text-3xl font-bold tracking-tight">AI-Powered Deployment</h2>
         <Button className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           New Deployment
         </Button>
       </div>
 
+      {/* AI Deployment Prompt - Main Feature */}
+      <Card className="shadow-lg border-0">
+        <CardHeader>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">Smart Deployment Prompt</CardTitle>
+              <CardDescription>Describe your infrastructure needs in plain English and let AI handle the rest</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe your infrastructure needs in plain English... For example: 'Deploy a scalable web application with load balancer, auto-scaling, and database backup to AWS'"
+            className="min-h-32 text-lg border-gray-200 focus:border-blue-500 resize-none"
+          />
+          
+          <div className="flex justify-between items-center">
+            <div className="flex space-x-2">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">AI-Powered</Badge>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">Multi-Cloud</Badge>
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800">RAG Ready</Badge>
+            </div>
+            <Button 
+              onClick={handleAIDeploy}
+              disabled={isAnalyzing || !prompt.trim()}
+              className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8"
+            >
+              {isAnalyzing ? (
+                <>
+                  <Clock className="w-4 h-4 mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  Deploy with AI
+                  <Sparkles className="w-4 h-4 ml-2" />
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Quick Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -172,10 +236,11 @@ export function DeploymentDashboard() {
         </Card>
       </div>
 
+      {/* Quick Deploy Options */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Deploy RAG Application</CardTitle>
-          <CardDescription>Deploy your RAG system to multiple cloud providers with one click</CardDescription>
+          <CardTitle>Quick Deploy Templates</CardTitle>
+          <CardDescription>Pre-configured RAG deployments for common use cases</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
@@ -187,7 +252,7 @@ export function DeploymentDashboard() {
               <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
                 <Cloud className="h-5 w-5 text-white" />
               </div>
-              <span className="font-medium">AWS</span>
+              <span className="font-medium">AWS Template</span>
               <span className="text-xs text-gray-500">Starting at $127/mo</span>
             </Button>
             <Button 
@@ -198,7 +263,7 @@ export function DeploymentDashboard() {
               <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
                 <Cloud className="h-5 w-5 text-white" />
               </div>
-              <span className="font-medium">Azure</span>
+              <span className="font-medium">Azure Template</span>
               <span className="text-xs text-gray-500">Starting at $142/mo</span>
             </Button>
             <Button 
@@ -209,7 +274,7 @@ export function DeploymentDashboard() {
               <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
                 <Cloud className="h-5 w-5 text-white" />
               </div>
-              <span className="font-medium">Google Cloud</span>
+              <span className="font-medium">GCP Template</span>
               <span className="text-xs text-gray-500">Starting at $134/mo</span>
             </Button>
           </div>
@@ -220,7 +285,7 @@ export function DeploymentDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Recent Deployments</CardTitle>
-          <CardDescription>Your latest RAG system deployments</CardDescription>
+          <CardDescription>Your latest AI-generated deployments</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -229,7 +294,7 @@ export function DeploymentDashboard() {
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <div>
                   <div className="font-medium">Customer Support RAG</div>
-                  <div className="text-sm text-gray-500">AWS EC2 • us-east-1</div>
+                  <div className="text-sm text-gray-500">AWS EC2 • us-east-1 • AI Generated</div>
                 </div>
               </div>
               <div className="text-right">
@@ -243,7 +308,7 @@ export function DeploymentDashboard() {
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <div>
                   <div className="font-medium">Documentation RAG</div>
-                  <div className="text-sm text-gray-500">Azure VM • eastus</div>
+                  <div className="text-sm text-gray-500">Azure VM • eastus • AI Generated</div>
                 </div>
               </div>
               <div className="text-right">
