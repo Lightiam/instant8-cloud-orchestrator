@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,18 @@ import { Badge } from '@/components/ui/badge';
 import { FileText, ChevronDown, ChevronUp } from 'lucide-react';
 
 const changeLogEntries = [
+  {
+    version: 'v1.3.0',
+    date: '2024-01-20',
+    type: 'Feature',
+    changes: [
+      'Implemented interactive cloud provider deployment',
+      'Added RAG configuration preview before deployment',
+      'Created actual deployment functionality to cloud providers',
+      'Enhanced deployment dashboard with real functionality',
+      'Added deployment status tracking and monitoring'
+    ]
+  },
   {
     version: 'v1.2.0',
     date: '2024-01-15',
