@@ -7,7 +7,6 @@ import { DeploymentConfig } from '@/services/deploymentService';
 import { DeploymentStats } from './DeploymentStats';
 import { QuickTemplates } from './QuickTemplates';
 import { RecentActivity } from './RecentActivity';
-import { DeploymentCredentialsAlert } from './DeploymentCredentialsAlert';
 
 interface DeploymentDashboardContentProps {
   credentialsValid: boolean;
@@ -24,8 +23,6 @@ export function DeploymentDashboardContent({
     <div className="grid lg:grid-cols-3 gap-6">
       {/* Main Content Area */}
       <div className="lg:col-span-2 space-y-6">
-        {!credentialsValid && <DeploymentCredentialsAlert />}
-        
         <Card className="shadow-lg border-0">
           <CardHeader>
             <div className="flex items-center space-x-3">
@@ -35,10 +32,7 @@ export function DeploymentDashboardContent({
               <div>
                 <CardTitle className="text-xl">AI Infrastructure Code Generator</CardTitle>
                 <CardDescription>
-                  {credentialsValid 
-                    ? "Describe your infrastructure needs and get Infrastructure as Code"
-                    : "Configure credentials in Environment Variables to enable IaC generation"
-                  }
+                  Describe your infrastructure needs and get Infrastructure as Code
                 </CardDescription>
               </div>
             </div>

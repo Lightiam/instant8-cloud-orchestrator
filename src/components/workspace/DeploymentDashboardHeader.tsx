@@ -14,16 +14,12 @@ export function DeploymentDashboardHeader({ credentialsValid, onNewInfrastructur
       <div>
         <h2 className="text-3xl font-bold tracking-tight">AI Infrastructure as Code Generator</h2>
         <p className="text-gray-600 mt-2">
-          {credentialsValid 
-            ? "Describe your infrastructure needs and get ready-to-deploy IaC code"
-            : "Configure your credentials in Environment Variables to start generating Infrastructure as Code"
-          }
+          Describe your infrastructure needs and get ready-to-deploy IaC code
         </p>
       </div>
       <Button 
         className="flex items-center gap-2"
         onClick={onNewInfrastructure}
-        disabled={!credentialsValid}
       >
         <Plus className="h-4 w-4" />
         New Infrastructure
