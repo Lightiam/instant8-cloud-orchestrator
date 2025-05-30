@@ -44,7 +44,7 @@ export function CompletedDeployment({ selectedProvider, onNewDeployment }: Compl
             <CheckCircle className="h-5 w-5" />
             Successfully Deployed to <span className={getProviderColor(selectedProvider)}>{getProviderName(selectedProvider)}</span>
           </CardTitle>
-          <CardDescription>Your infrastructure is now provisioned and running on {getProviderName(selectedProvider)}</CardDescription>
+          <CardDescription>Your application is now running on {getProviderName(selectedProvider)} and ready to use</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -64,7 +64,7 @@ export function CompletedDeployment({ selectedProvider, onNewDeployment }: Compl
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Provider</CardTitle>
+            <CardTitle className="text-sm font-medium">Cloud Platform</CardTitle>
             <Cloud className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
