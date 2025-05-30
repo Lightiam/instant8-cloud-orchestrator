@@ -1,12 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Key, Eye, EyeOff, Trash2, Plus, Save } from 'lucide-react';
+import { Key } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProviderTemplates } from './ProviderTemplates';
+import { EnvironmentVariableForm } from './EnvironmentVariableForm';
+import { EnvironmentVariablesList } from './EnvironmentVariablesList';
 
 interface EnvVariable {
   key: string;
@@ -88,8 +88,16 @@ export function EnvironmentVariables() {
     }));
   };
 
-  const getProviderVars = (provider: string) => {
-    return envVars.filter(v => v.provider === provider);
+  const handleTemplateSelect = (key: string, provider: string) => {
+    setNewVar({ ...newVar, key, provider });
+  };
+
+  const handleKeyChange = (key: string) => {
+    setNewVar({ ...newVar, key });
+  };
+
+  const handleValueChange = (value: string) => {
+    setNewVar({ ...newVar, value });
   };
 
   const providerTemplates = {
@@ -140,108 +148,27 @@ export function EnvironmentVariables() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Template suggestions */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Required Variables:</Label>
-                  <div className="grid gap-2">
-                    {templates.map((template) => (
-                      <div key={template.key} className="flex items-center justify-between p-2 border rounded">
-                        <div>
-                          <code className="text-sm bg-gray-100 px-1 rounded">{template.key}</code>
-                          <p className="text-xs text-gray-600 mt-1">{template.description}</p>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setNewVar({ ...newVar, key: template.key, provider })}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ProviderTemplates 
+                  provider={provider}
+                  templates={templates}
+                  onTemplateSelect={handleTemplateSelect}
+                />
 
-                {/* Add new variable form */}
-                <div className="border-t pt-4 space-y-3">
-                  <Label className="text-sm font-medium">Add New Variable:</Label>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div>
-                      <Label htmlFor="key">Variable Name</Label>
-                      <Input
-                        id="key"
-                        placeholder="e.g., AWS_ACCESS_KEY_ID"
-                        value={newVar.provider === provider ? newVar.key : ''}
-                        onChange={(e) => setNewVar({ ...newVar, key: e.target.value, provider })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="value">Value</Label>
-                      <Input
-                        id="value"
-                        type="password"
-                        placeholder="Enter the value"
-                        value={newVar.provider === provider ? newVar.value : ''}
-                        onChange={(e) => setNewVar({ ...newVar, value: e.target.value, provider })}
-                      />
-                    </div>
-                    <Button onClick={addEnvVar} className="w-full">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Variable
-                    </Button>
-                  </div>
-                </div>
+                <EnvironmentVariableForm
+                  newVar={newVar}
+                  provider={provider}
+                  onKeyChange={handleKeyChange}
+                  onValueChange={handleValueChange}
+                  onSubmit={addEnvVar}
+                />
 
-                {/* Existing variables */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">Configured Variables:</Label>
-                  {getProviderVars(provider).length === 0 ? (
-                    <p className="text-sm text-gray-500 italic">No variables configured yet</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {getProviderVars(provider).map((envVar, index) => (
-                        <div key={`${envVar.key}-${index}`} className="flex items-center justify-between p-3 border rounded">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <code className="text-sm bg-gray-100 px-1 rounded">{envVar.key}</code>
-                              <Badge variant="outline" className="text-xs">
-                                {provider.toUpperCase()}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <code className="text-xs text-gray-600">
-                                {showValues[`${envVar.key}-${index}`] 
-                                  ? envVar.value 
-                                  : '•'.repeat(Math.min(envVar.value.length, 20))
-                                }
-                              </code>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => toggleShowValue(`${envVar.key}-${index}`)}
-                            >
-                              {showValues[`${envVar.key}-${index}`] ? (
-                                <EyeOff className="h-3 w-3" />
-                              ) : (
-                                <Eye className="h-3 w-3" />
-                              )}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteEnvVar(index)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <EnvironmentVariablesList
+                  envVars={envVars}
+                  provider={provider}
+                  showValues={showValues}
+                  onToggleShow={toggleShowValue}
+                  onDelete={deleteEnvVar}
+                />
               </CardContent>
             </Card>
           </TabsContent>
