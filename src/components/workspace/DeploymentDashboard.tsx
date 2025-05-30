@@ -6,7 +6,6 @@ import { IaCCodePreview } from '../deployment/IaCCodePreview';
 import { FeaturesBanner } from './FeaturesBanner';
 import { CompletedDeployment } from './CompletedDeployment';
 import { DeploymentConfig } from '@/services/deploymentService';
-import { hasValidCredentials } from '@/utils/environmentUtils';
 import { DeploymentDashboardHeader } from './DeploymentDashboardHeader';
 import { DeploymentDashboardContent } from './DeploymentDashboardContent';
 
@@ -14,7 +13,6 @@ type DeploymentStep = 'chat' | 'iac-preview' | 'preview' | 'deploying' | 'comple
 
 export function DeploymentDashboard() {
   const [currentStep, setCurrentStep] = useState<DeploymentStep>('chat');
-  const [credentialsValid, setCredentialsValid] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string>('');
   const [config, setConfig] = useState<DeploymentConfig>({
     os: 'Ubuntu 22.04 LTS',
@@ -25,31 +23,13 @@ export function DeploymentDashboard() {
     type: 'web-application'
   });
 
-  const checkCredentials = () => {
-    const isValid = hasValidCredentials();
-    console.log('Credential check result:', isValid);
-    setCredentialsValid(isValid);
-    return isValid;
-  };
-
   const handleConfigGenerated = (newConfig: DeploymentConfig) => {
     console.log('AI generated configuration:', newConfig);
-    
-    // Check credentials before proceeding
-    if (!checkCredentials()) {
-      console.log('No valid credentials found, staying on chat');
-      return;
-    }
-    
     setConfig(newConfig);
     setCurrentStep('iac-preview');
   };
 
   const handleQuickDeploy = (provider: string) => {
-    if (!checkCredentials()) {
-      console.log('Quick deploy blocked - no credentials');
-      return;
-    }
     console.log(`Quick deploying to ${provider}`);
     setSelectedProvider(provider);
     setCurrentStep('iac-preview');
@@ -81,35 +61,6 @@ export function DeploymentDashboard() {
   const handleNewInfrastructure = () => {
     setCurrentStep('chat');
   };
-
-  // Check credentials on mount and when returning to this component
-  React.useEffect(() => {
-    console.log('DeploymentDashboard mounted, checking credentials...');
-    checkCredentials();
-  }, []);
-
-  // Listen for storage changes and custom events
-  React.useEffect(() => {
-    const handleStorageChange = () => {
-      console.log('Storage change detected, rechecking credentials...');
-      checkCredentials();
-    };
-
-    const handleCredentialsUpdate = () => {
-      console.log('Credentials update event detected, rechecking...');
-      setTimeout(() => {
-        checkCredentials();
-      }, 100); // Small delay to ensure localStorage is updated
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('credentialsUpdated', handleCredentialsUpdate);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('credentialsUpdated', handleCredentialsUpdate);
-    };
-  }, []);
 
   if (currentStep === 'iac-preview') {
     return (
@@ -153,12 +104,12 @@ export function DeploymentDashboard() {
   return (
     <div className="space-y-6">
       <DeploymentDashboardHeader 
-        credentialsValid={credentialsValid}
+        credentialsValid={true}
         onNewInfrastructure={handleNewInfrastructure}
       />
 
       <DeploymentDashboardContent
-        credentialsValid={credentialsValid}
+        credentialsValid={true}
         onConfigGenerated={handleConfigGenerated}
         onQuickDeploy={handleQuickDeploy}
       />
