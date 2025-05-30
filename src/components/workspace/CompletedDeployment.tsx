@@ -10,6 +10,15 @@ interface CompletedDeploymentProps {
 }
 
 export function CompletedDeployment({ selectedProvider, onNewDeployment }: CompletedDeploymentProps) {
+  const getProviderName = (provider: string) => {
+    switch (provider.toLowerCase()) {
+      case 'aws': return 'AWS';
+      case 'azure': return 'Azure';
+      case 'gcp': return 'Google Cloud';
+      default: return provider.toUpperCase();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -24,9 +33,9 @@ export function CompletedDeployment({ selectedProvider, onNewDeployment }: Compl
         <CardHeader>
           <CardTitle className="text-green-800 flex items-center gap-2">
             <CheckCircle className="h-5 w-5" />
-            Successfully Deployed to {selectedProvider.toUpperCase()}
+            Successfully Deployed to {getProviderName(selectedProvider)}
           </CardTitle>
-          <CardDescription>Your RAG application is now running and ready to use</CardDescription>
+          <CardDescription>Your application is now running and ready to use</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={onNewDeployment}>
@@ -35,7 +44,7 @@ export function CompletedDeployment({ selectedProvider, onNewDeployment }: Compl
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Deployments</CardTitle>
@@ -49,12 +58,12 @@ export function CompletedDeployment({ selectedProvider, onNewDeployment }: Compl
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
+            <CardTitle className="text-sm font-medium">Status</CardTitle>
             <Settings className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$974.92</div>
-            <p className="text-xs text-muted-foreground">This month</p>
+            <div className="text-2xl font-bold text-green-600">Running</div>
+            <p className="text-xs text-muted-foreground">All systems operational</p>
           </CardContent>
         </Card>
       </div>

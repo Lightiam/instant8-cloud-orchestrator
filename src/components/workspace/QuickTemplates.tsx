@@ -13,7 +13,7 @@ export function QuickTemplates({ onQuickDeploy }: QuickTemplatesProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">Quick Templates</CardTitle>
-        <CardDescription>Skip the chat with pre-configured setups</CardDescription>
+        <CardDescription>Pre-configured deployment templates</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <Button 
@@ -27,7 +27,7 @@ export function QuickTemplates({ onQuickDeploy }: QuickTemplatesProps) {
             </div>
             <div className="text-left">
               <div className="font-medium">Web App - AWS</div>
-              <div className="text-xs text-gray-500">$127/mo</div>
+              <div className="text-xs text-gray-500">Standard configuration</div>
             </div>
           </div>
         </Button>
@@ -43,7 +43,7 @@ export function QuickTemplates({ onQuickDeploy }: QuickTemplatesProps) {
             </div>
             <div className="text-left">
               <div className="font-medium">ML Pipeline - Azure</div>
-              <div className="text-xs text-gray-500">$342/mo</div>
+              <div className="text-xs text-gray-500">Machine learning ready</div>
             </div>
           </div>
         </Button>

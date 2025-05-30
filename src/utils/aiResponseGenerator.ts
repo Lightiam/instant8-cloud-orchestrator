@@ -10,12 +10,6 @@ interface AIResponse {
 export const generateAIResponse = (userInput: string, credentialsValid: boolean): AIResponse => {
   const input = userInput.toLowerCase();
   
-  if (!credentialsValid) {
-    return {
-      content: "I see you'd like to deploy infrastructure, but I notice your credentials aren't configured yet. Please set up your cloud provider credentials above to enable real deployments. Once configured, I can generate actual Infrastructure as Code for your requirements!"
-    };
-  }
-
   // Check for deployment-related keywords
   const deploymentKeywords = ['deploy', 'create', 'provision', 'infrastructure', 'server', 'database', 'application'];
   const hasDeploymentIntent = deploymentKeywords.some(keyword => input.includes(keyword));
@@ -79,15 +73,12 @@ export const generateAIResponse = (userInput: string, credentialsValid: boolean)
 - **Region**: ${config.region}
 - **Type**: ${config.type.replace('-', ' ').toUpperCase()}
 
-I'm now generating the Infrastructure as Code (IaC) for this configuration. You'll be able to review the generated Pulumi and Terraform code before deployment. This will create:
+I'm now generating the Infrastructure as Code (IaC) for this configuration. You'll be able to review the generated code before deployment. This will create:
 
-🖥️ **Compute**: EC2 instance with specified resources
-🗄️ **Database**: PostgreSQL RDS instance for vector storage
-🌐 **Network**: VPC, subnets, security groups, and load balancer
-🔒 **Security**: SSL certificates and proper access controls
-📊 **Monitoring**: CloudWatch logging and metrics
-
-The estimated monthly cost will be approximately **$47-85** depending on usage.
+🖥️ **Compute**: Virtual machine with specified resources
+🗄️ **Database**: Database instance for data storage
+🌐 **Network**: Virtual network and security configurations
+🔒 **Security**: Access controls and certificates
 
 Would you like me to proceed with generating the Infrastructure as Code?`,
       config,
@@ -108,31 +99,17 @@ Would you like me to proceed with generating the Infrastructure as Code?`,
 };
 
 export const getWelcomeMessage = (credentialsValid: boolean): string => {
-  if (credentialsValid) {
-    return `🚀 **Welcome to the AI Infrastructure Assistant!**
+  return `🚀 **Welcome to the AI Infrastructure Assistant!**
 
-Your cloud credentials are configured and ready. I can help you:
+I can help you:
 
-✨ **Generate Infrastructure as Code** - Describe your needs and I'll create Pulumi/Terraform code
+✨ **Generate Infrastructure as Code** - Describe your needs and I'll create deployment code
 🌐 **Deploy Real Infrastructure** - Provision actual cloud resources on AWS, Azure, or GCP  
-🏗️ **RAG Applications** - Set up AI-powered applications with vector databases
+🏗️ **Applications** - Set up web applications and services
 📊 **ML Workloads** - Configure GPU instances and ML frameworks
-🗄️ **Databases** - Deploy PostgreSQL, MySQL, or vector databases
+🗄️ **Databases** - Deploy PostgreSQL, MySQL, or other databases
 
 Just describe what you want to deploy and I'll generate the Infrastructure as Code for you to review before deployment!
 
-**Example:** "Deploy a RAG application with vector database on AWS"`;
-  }
-  
-  return `👋 **Welcome to the AI Infrastructure Assistant!**
-
-I can help you generate Infrastructure as Code and deploy real cloud infrastructure, but first you'll need to configure your cloud provider credentials above.
-
-Once configured, I can:
-- Generate Pulumi and Terraform code
-- Deploy to AWS, Azure, or GCP
-- Create RAG applications with vector databases
-- Set up ML environments with GPU support
-
-Please configure your credentials above to get started with real deployments!`;
+**Example:** "Deploy a web application with database on Azure"`;
 };
