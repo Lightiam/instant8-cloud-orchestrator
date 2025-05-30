@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key, CheckCircle, AlertCircle } from 'lucide-react';
 import { useCredentials } from '@/hooks/useCredentials';
-import { PulumiCredentialsForm } from './credentials/PulumiCredentialsForm';
 import { AzureCredentialsForm } from './credentials/AzureCredentialsForm';
 import { AWSCredentialsForm } from './credentials/AWSCredentialsForm';
 
@@ -21,7 +20,7 @@ export function CredentialsSetup({ onCredentialsSet }: CredentialsSetupProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Key className="h-5 w-5" />
-          Deployment Credentials
+          Cloud Provider Credentials
           {isValid && <Badge className="bg-green-100 text-green-800">
             <CheckCircle className="h-3 w-3 mr-1" />
             Configured
@@ -29,20 +28,11 @@ export function CredentialsSetup({ onCredentialsSet }: CredentialsSetupProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="pulumi" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="pulumi">Pulumi</TabsTrigger>
+        <Tabs defaultValue="azure" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="azure">Azure</TabsTrigger>
             <TabsTrigger value="aws">AWS</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="pulumi" className="space-y-4">
-            <PulumiCredentialsForm
-              credentials={credentials}
-              isValidating={isValidating}
-              onSubmit={validateAndSetCredentials}
-            />
-          </TabsContent>
           
           <TabsContent value="azure" className="space-y-4">
             <AzureCredentialsForm
@@ -65,10 +55,10 @@ export function CredentialsSetup({ onCredentialsSet }: CredentialsSetupProps) {
           <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-center gap-2 text-yellow-800">
               <AlertCircle className="h-4 w-4" />
-              <span className="text-sm font-medium">Credentials Required</span>
+              <span className="text-sm font-medium">Cloud Provider Credentials Required</span>
             </div>
             <p className="text-xs text-yellow-700 mt-1">
-              Please configure your cloud provider credentials to enable real deployments using Azure best practices.
+              Please configure your cloud provider credentials to enable deployments using industry best practices.
             </p>
           </div>
         )}
