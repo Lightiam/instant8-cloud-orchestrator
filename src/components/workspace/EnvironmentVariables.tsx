@@ -36,6 +36,9 @@ export function EnvironmentVariables() {
   const saveEnvVars = (vars: EnvVariable[]) => {
     localStorage.setItem('instant8-env-vars', JSON.stringify(vars));
     setEnvVars(vars);
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('credentialsUpdated'));
   };
 
   const addEnvVar = () => {

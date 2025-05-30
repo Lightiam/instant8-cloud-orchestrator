@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,10 +15,10 @@ import { CompletedDeployment } from './CompletedDeployment';
 import { DeploymentConfig } from '@/services/deploymentService';
 import { hasValidCredentials } from '@/utils/environmentUtils';
 
-type DeploymentStep = 'credentials' | 'chat' | 'iac-preview' | 'preview' | 'deploying' | 'completed';
+type DeploymentStep = 'chat' | 'iac-preview' | 'preview' | 'deploying' | 'completed';
 
 export function DeploymentDashboard() {
-  const [currentStep, setCurrentStep] = useState<DeploymentStep>('credentials');
+  const [currentStep, setCurrentStep] = useState<DeploymentStep>('chat');
   const [credentialsValid, setCredentialsValid] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string>('');
   const [config, setConfig] = useState<DeploymentConfig>({
@@ -29,11 +30,10 @@ export function DeploymentDashboard() {
     type: 'web-application'
   });
 
-  const handleCredentialsSet = (isValid: boolean) => {
+  const checkCredentials = () => {
+    const isValid = hasValidCredentials();
     setCredentialsValid(isValid);
-    if (isValid && currentStep === 'credentials') {
-      setCurrentStep('chat');
-    }
+    return isValid;
   };
 
   const handleConfigGenerated = (newConfig: DeploymentConfig) => {
@@ -43,8 +43,7 @@ export function DeploymentDashboard() {
   };
 
   const handleQuickDeploy = (provider: string) => {
-    if (!credentialsValid) {
-      setCurrentStep('credentials');
+    if (!checkCredentials()) {
       return;
     }
     console.log(`Quick deploying to ${provider}`);
@@ -75,13 +74,31 @@ export function DeploymentDashboard() {
     setSelectedProvider('');
   };
 
+  // Check credentials on mount and when returning to this component
   React.useEffect(() => {
-    const isValid = hasValidCredentials();
-    setCredentialsValid(isValid);
-    if (isValid && currentStep === 'credentials') {
-      setCurrentStep('chat');
-    }
-  }, [currentStep]);
+    checkCredentials();
+  }, []);
+
+  // Listen for storage changes to update credentials status
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      checkCredentials();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom events when credentials are updated in the same tab
+    const handleCredentialsUpdate = () => {
+      checkCredentials();
+    };
+    
+    window.addEventListener('credentialsUpdated', handleCredentialsUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('credentialsUpdated', handleCredentialsUpdate);
+    };
+  }, []);
 
   if (currentStep === 'iac-preview') {
     return (
@@ -169,32 +186,30 @@ export function DeploymentDashboard() {
             </Card>
           )}
           
-          {(credentialsValid || currentStep === 'chat') && (
-            <Card className="shadow-lg border-0">
-              <CardHeader>
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">AI Infrastructure Code Generator</CardTitle>
-                    <CardDescription>
-                      {credentialsValid 
-                        ? "Describe your infrastructure needs and get Infrastructure as Code"
-                        : "Configure credentials in Environment Variables to enable IaC generation"
-                      }
-                    </CardDescription>
-                  </div>
+          <Card className="shadow-lg border-0">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-white" />
                 </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ChatDeploymentInterface 
-                  onConfigGenerated={handleConfigGenerated}
-                  credentialsValid={credentialsValid}
-                />
-              </CardContent>
-            </Card>
-          )}
+                <div>
+                  <CardTitle className="text-xl">AI Infrastructure Code Generator</CardTitle>
+                  <CardDescription>
+                    {credentialsValid 
+                      ? "Describe your infrastructure needs and get Infrastructure as Code"
+                      : "Configure credentials in Environment Variables to enable IaC generation"
+                    }
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <ChatDeploymentInterface 
+                onConfigGenerated={handleConfigGenerated}
+                credentialsValid={credentialsValid}
+              />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Sidebar */}
