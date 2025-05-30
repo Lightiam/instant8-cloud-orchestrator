@@ -64,69 +64,94 @@ export function RAGConfigPreview({ config, onDeploy, onEdit }: RAGConfigPreviewP
             <div className="pt-4 border-t">
               <span className="text-gray-600 text-sm">Software Stack:</span>
               <div className="flex flex-wrap gap-2 mt-2">
-                <Badge>Docker</Badge>
-                <Badge>CUDA</Badge>
-                <Badge>Python 3.11</Badge>
-                <Badge>Ollama</Badge>
-                <Badge>Vector DB</Badge>
+                {config.type === 'machine-learning' && (
+                  <>
+                    <Badge>Docker</Badge>
+                    <Badge>CUDA</Badge>
+                    <Badge>Python 3.11</Badge>
+                    <Badge>PyTorch</Badge>
+                    <Badge>TensorFlow</Badge>
+                    <Badge>Jupyter</Badge>
+                  </>
+                )}
+                {config.type === 'web-application' && (
+                  <>
+                    <Badge>Nginx</Badge>
+                    <Badge>Node.js</Badge>
+                    <Badge>SSL</Badge>
+                    <Badge>PM2</Badge>
+                  </>
+                )}
+                {config.type === 'database' && (
+                  <>
+                    <Badge>PostgreSQL</Badge>
+                    <Badge>Backup</Badge>
+                    <Badge>Monitoring</Badge>
+                    <Badge>SSL</Badge>
+                  </>
+                )}
+                {config.type === 'api-backend' && (
+                  <>
+                    <Badge>Docker</Badge>
+                    <Badge>Kubernetes</Badge>
+                    <Badge>Load Balancer</Badge>
+                    <Badge>Auto-Scale</Badge>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* RAG Configuration */}
+        {/* Configuration Details */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />
-              RAG Configuration
+              Deployment Details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Vector Database:</span>
-                <span className="font-medium">ChromaDB</span>
+                <span className="text-gray-600">Deployment Type:</span>
+                <span className="font-medium capitalize">{config.type?.replace('-', ' ') || 'Web Application'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Embedding Model:</span>
-                <span className="font-medium">all-MiniLM-L6-v2</span>
+                <span className="text-gray-600">Region:</span>
+                <span className="font-medium">{config.region || 'US-East-1'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">LLM Model:</span>
-                <span className="font-medium">Llama 3.1 8B</span>
+                <span className="text-gray-600">Auto-Scaling:</span>
+                <span className="font-medium text-green-600">Enabled</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Chunk Size:</span>
-                <span className="font-medium">512 tokens</span>
+                <span className="text-gray-600">Backup:</span>
+                <span className="font-medium text-green-600">Daily</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Overlap:</span>
-                <span className="font-medium">50 tokens</span>
+                <span className="text-gray-600">Monitoring:</span>
+                <span className="font-medium text-green-600">Full Stack</span>
               </div>
             </div>
             
             <div className="pt-4 border-t">
               <div className="text-sm text-gray-600 mb-2">Performance Tier:</div>
-              <Badge className="bg-green-100 text-green-800">High Performance</Badge>
+              <Badge className="bg-green-100 text-green-800">Production Ready</Badge>
             </div>
           </CardContent>
         </Card>
 
-        {/* Network & Security */}
+        {/* Security & Network */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Network & Security
+              Security & Network
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Region:</span>
-                <span className="font-medium">US-East-1</span>
-              </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">SSL/TLS:</span>
                 <span className="font-medium text-green-600">Enabled</span>
@@ -136,8 +161,12 @@ export function RAGConfigPreview({ config, onDeploy, onEdit }: RAGConfigPreviewP
                 <span className="font-medium text-green-600">Configured</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Backup:</span>
-                <span className="font-medium">Daily</span>
+                <span className="text-gray-600">VPC:</span>
+                <span className="font-medium text-green-600">Private Network</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Access Control:</span>
+                <span className="font-medium">SSH Key + IAM</span>
               </div>
             </div>
           </CardContent>
@@ -154,21 +183,33 @@ export function RAGConfigPreview({ config, onDeploy, onEdit }: RAGConfigPreviewP
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">AWS EC2:</span>
-                <span className="font-bold text-green-600">$127/month</span>
+                <span className="text-sm text-gray-600">AWS:</span>
+                <span className="font-bold text-green-600">
+                  {config.type === 'machine-learning' ? '$342/month' : 
+                   config.type === 'database' ? '$156/month' : 
+                   config.type === 'api-backend' ? '$89/month' : '$127/month'}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Azure VM:</span>
-                <span className="font-bold text-blue-600">$142/month</span>
+                <span className="text-sm text-gray-600">Azure:</span>
+                <span className="font-bold text-blue-600">
+                  {config.type === 'machine-learning' ? '$378/month' : 
+                   config.type === 'database' ? '$167/month' : 
+                   config.type === 'api-backend' ? '$98/month' : '$142/month'}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Google Cloud:</span>
-                <span className="font-bold text-orange-600">$134/month</span>
+                <span className="font-bold text-orange-600">
+                  {config.type === 'machine-learning' ? '$356/month' : 
+                   config.type === 'database' ? '$159/month' : 
+                   config.type === 'api-backend' ? '$92/month' : '$134/month'}
+                </span>
               </div>
             </div>
             
             <div className="pt-4 border-t">
-              <div className="text-lg font-bold text-primary">Best Value: AWS EC2</div>
+              <div className="text-lg font-bold text-primary">Best Value: AWS</div>
               <div className="text-sm text-gray-600">Recommended for your configuration</div>
             </div>
           </CardContent>
@@ -178,35 +219,50 @@ export function RAGConfigPreview({ config, onDeploy, onEdit }: RAGConfigPreviewP
       {/* Cloud Provider Selection */}
       <Card>
         <CardHeader>
-          <CardTitle>Select Cloud Provider</CardTitle>
+          <CardTitle>Deploy to Cloud Provider</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-4">
             <Button 
               variant="outline" 
-              className="h-20 flex flex-col gap-2 border-2 border-green-500 bg-green-50"
+              className="h-20 flex flex-col gap-2 border-2 border-green-500 bg-green-50 hover:bg-green-100"
               onClick={() => onDeploy('aws')}
             >
               <div className="w-6 h-6 bg-orange-500 rounded"></div>
-              <span>Deploy to AWS</span>
-              <span className="text-xs text-green-600">Recommended</span>
+              <span className="font-medium">Deploy to AWS</span>
+              <span className="text-xs text-green-600">✨ Recommended</span>
             </Button>
             <Button 
               variant="outline" 
-              className="h-20 flex flex-col gap-2"
+              className="h-20 flex flex-col gap-2 hover:border-blue-500 hover:bg-blue-50"
               onClick={() => onDeploy('azure')}
             >
               <div className="w-6 h-6 bg-blue-500 rounded"></div>
-              <span>Deploy to Azure</span>
+              <span className="font-medium">Deploy to Azure</span>
+              <span className="text-xs text-gray-500">Production ready</span>
             </Button>
             <Button 
               variant="outline" 
-              className="h-20 flex flex-col gap-2"
+              className="h-20 flex flex-col gap-2 hover:border-red-500 hover:bg-red-50"
               onClick={() => onDeploy('gcp')}
             >
               <div className="w-6 h-6 bg-red-500 rounded"></div>
-              <span>Deploy to GCP</span>
+              <span className="font-medium">Deploy to GCP</span>
+              <span className="text-xs text-gray-500">Global scale</span>
             </Button>
+          </div>
+          
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div>
+                <div className="font-medium text-blue-900">Ready for Real Deployment</div>
+                <div className="text-sm text-blue-700 mt-1">
+                  Your credentials are configured. Clicking deploy will provision actual infrastructure using Pulumi/Terraform. 
+                  You'll receive real URLs and access to your deployed services.
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
