@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Plus, MessageSquare } from 'lucide-react';
 import { RAGConfigPreview } from './RAGConfigPreview';
 import { DeploymentProgress } from './DeploymentProgress';
 import { ChatDeploymentInterface } from '../deployment/ChatDeploymentInterface';
+import { IaCCodePreview } from '../deployment/IaCCodePreview';
 import { CredentialsSetup } from '../deployment/CredentialsSetup';
 import { DeploymentStats } from './DeploymentStats';
 import { QuickTemplates } from './QuickTemplates';
@@ -14,7 +14,7 @@ import { FeaturesBanner } from './FeaturesBanner';
 import { CompletedDeployment } from './CompletedDeployment';
 import { DeploymentConfig } from '@/services/deploymentService';
 
-type DeploymentStep = 'credentials' | 'chat' | 'preview' | 'deploying' | 'completed';
+type DeploymentStep = 'credentials' | 'chat' | 'iac-preview' | 'preview' | 'deploying' | 'completed';
 
 export function DeploymentDashboard() {
   const [currentStep, setCurrentStep] = useState<DeploymentStep>('credentials');
@@ -39,7 +39,7 @@ export function DeploymentDashboard() {
   const handleConfigGenerated = (newConfig: DeploymentConfig) => {
     console.log('AI generated configuration:', newConfig);
     setConfig(newConfig);
-    setCurrentStep('preview');
+    setCurrentStep('iac-preview');
   };
 
   const handleQuickDeploy = (provider: string) => {
@@ -49,7 +49,7 @@ export function DeploymentDashboard() {
     }
     console.log(`Quick deploying to ${provider}`);
     setSelectedProvider(provider);
-    setCurrentStep('preview');
+    setCurrentStep('iac-preview');
   };
 
   const handleDeploy = (provider: string) => {
@@ -62,6 +62,10 @@ export function DeploymentDashboard() {
     setCurrentStep('chat');
   };
 
+  const handleBackToChat = () => {
+    setCurrentStep('chat');
+  };
+
   const handleDeploymentComplete = () => {
     setCurrentStep('completed');
   };
@@ -70,6 +74,16 @@ export function DeploymentDashboard() {
     setCurrentStep('chat');
     setSelectedProvider('');
   };
+
+  if (currentStep === 'iac-preview') {
+    return (
+      <IaCCodePreview 
+        config={config}
+        onDeploy={handleDeploy}
+        onBack={handleBackToChat}
+      />
+    );
+  }
 
   if (currentStep === 'preview') {
     return (
@@ -86,7 +100,7 @@ export function DeploymentDashboard() {
       <DeploymentProgress 
         provider={selectedProvider}
         onComplete={handleDeploymentComplete}
-        onCancel={() => setCurrentStep('preview')}
+        onCancel={() => setCurrentStep('iac-preview')}
       />
     );
   }
@@ -104,11 +118,11 @@ export function DeploymentDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">AI Deployment Assistant</h2>
+          <h2 className="text-3xl font-bold tracking-tight">AI Infrastructure as Code Generator</h2>
           <p className="text-gray-600 mt-2">
             {credentialsValid 
-              ? "Configure and deploy real infrastructure with AI assistance"
-              : "Set up your credentials to start deploying infrastructure"
+              ? "Describe your infrastructure needs and get ready-to-deploy IaC code"
+              : "Set up your credentials to start generating Infrastructure as Code"
             }
           </p>
         </div>
@@ -118,7 +132,7 @@ export function DeploymentDashboard() {
           disabled={!credentialsValid}
         >
           <Plus className="h-4 w-4" />
-          New Deployment
+          New Infrastructure
         </Button>
       </div>
 
@@ -137,11 +151,11 @@ export function DeploymentDashboard() {
                     <MessageSquare className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">AI Deployment Chat</CardTitle>
+                    <CardTitle className="text-xl">AI Infrastructure Code Generator</CardTitle>
                     <CardDescription>
                       {credentialsValid 
-                        ? "Describe your infrastructure needs and get real deployments"
-                        : "Configure credentials above to enable real deployments"
+                        ? "Describe your infrastructure needs and get Infrastructure as Code"
+                        : "Configure credentials above to enable IaC generation"
                       }
                     </CardDescription>
                   </div>

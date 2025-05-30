@@ -10,8 +10,8 @@ export function ChatStatusIndicator({ credentialsValid }: ChatStatusIndicatorPro
     <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
       <span>
         {credentialsValid 
-          ? "🚀 Ready for real deployments • AI-powered infrastructure"
-          : "⚠️ Configure credentials to enable deployments"
+          ? "🚀 Ready to generate Infrastructure as Code • Pulumi & Terraform"
+          : "⚠️ Configure credentials to enable IaC generation"
         }
       </span>
       <span>Press Enter to send</span>

@@ -3,77 +3,136 @@ import { DeploymentConfig } from '@/services/deploymentService';
 
 interface AIResponse {
   content: string;
-  config: DeploymentConfig | null;
+  config?: DeploymentConfig;
+  generateIaC?: boolean;
 }
 
-export function generateAIResponse(userInput: string, credentialsValid: boolean): AIResponse {
-  const input_lower = userInput.toLowerCase();
+export const generateAIResponse = (userInput: string, credentialsValid: boolean): AIResponse => {
+  const input = userInput.toLowerCase();
   
   if (!credentialsValid) {
     return {
-      content: "I'd love to help you deploy that! However, I need your cloud provider credentials to be configured first. Please set up your Pulumi, AWS, Azure, or GCP credentials in the panel above, then we can proceed with your deployment.",
-      config: null
+      content: "I see you'd like to deploy infrastructure, but I notice your credentials aren't configured yet. Please set up your cloud provider credentials above to enable real deployments. Once configured, I can generate actual Infrastructure as Code for your requirements!"
     };
+  }
+
+  // Check for deployment-related keywords
+  const deploymentKeywords = ['deploy', 'create', 'provision', 'infrastructure', 'server', 'database', 'application'];
+  const hasDeploymentIntent = deploymentKeywords.some(keyword => input.includes(keyword));
+
+  if (hasDeploymentIntent) {
+    // Parse the requirements
+    let config: DeploymentConfig = {
+      os: 'Ubuntu 22.04 LTS',
+      cpu: '4 cores',
+      ram: '8GB',
+      storage: '50GB SSD',
+      region: 'us-east-1',
+      type: 'web-application'
+    };
+
+    // Enhanced parsing logic
+    if (input.includes('rag') || input.includes('ai') || input.includes('ml') || input.includes('machine learning')) {
+      config.type = 'machine-learning';
+      config.cpu = '8 cores';
+      config.ram = '16GB';
+      config.storage = '100GB SSD';
+    }
+
+    if (input.includes('database') || input.includes('postgres') || input.includes('mysql')) {
+      config.type = 'database';
+      config.ram = '16GB';
+      config.storage = '200GB SSD';
+    }
+
+    // Parse specific requirements
+    if (input.includes('16gb') || input.includes('16 gb')) {
+      config.ram = '16GB';
+    }
+    if (input.includes('32gb') || input.includes('32 gb')) {
+      config.ram = '32GB';
+    }
+    if (input.includes('gpu')) {
+      config.type = 'machine-learning';
+      config.cpu = '16 cores';
+      config.ram = '32GB';
+    }
+
+    if (input.includes('azure') || input.includes('microsoft')) {
+      config.region = 'East US';
+    }
+    if (input.includes('aws') || input.includes('amazon')) {
+      config.region = 'us-east-1';
+    }
+    if (input.includes('gcp') || input.includes('google')) {
+      config.region = 'us-central1';
+    }
+
+    return {
+      content: `Perfect! I've analyzed your requirements and generated a comprehensive infrastructure configuration for your ${config.type.replace('-', ' ')} deployment.
+
+**Configuration Summary:**
+- **OS**: ${config.os}
+- **CPU**: ${config.cpu}
+- **RAM**: ${config.ram}
+- **Storage**: ${config.storage}
+- **Region**: ${config.region}
+- **Type**: ${config.type.replace('-', ' ').toUpperCase()}
+
+I'm now generating the Infrastructure as Code (IaC) for this configuration. You'll be able to review the generated Pulumi and Terraform code before deployment. This will create:
+
+🖥️ **Compute**: EC2 instance with specified resources
+🗄️ **Database**: PostgreSQL RDS instance for vector storage
+🌐 **Network**: VPC, subnets, security groups, and load balancer
+🔒 **Security**: SSL certificates and proper access controls
+📊 **Monitoring**: CloudWatch logging and metrics
+
+The estimated monthly cost will be approximately **$47-85** depending on usage.
+
+Would you like me to proceed with generating the Infrastructure as Code?`,
+      config,
+      generateIaC: true
+    };
+  }
+
+  // Handle other types of queries
+  const responses = [
+    "I can help you deploy various types of infrastructure! Tell me what you'd like to deploy - for example: 'Deploy a web application with PostgreSQL database' or 'Create a machine learning environment with GPU support'.",
+    "What kind of infrastructure would you like me to help you deploy? I can create configurations for web applications, databases, ML workloads, and more. Just describe your requirements!",
+    "I'm ready to help you provision cloud infrastructure! Whether you need a simple web server, a complex ML pipeline, or a scalable database, just describe what you want to deploy.",
+  ];
+
+  return {
+    content: responses[Math.floor(Math.random() * responses.length)]
+  };
+};
+
+export const getWelcomeMessage = (credentialsValid: boolean): string => {
+  if (credentialsValid) {
+    return `🚀 **Welcome to the AI Infrastructure Assistant!**
+
+Your cloud credentials are configured and ready. I can help you:
+
+✨ **Generate Infrastructure as Code** - Describe your needs and I'll create Pulumi/Terraform code
+🌐 **Deploy Real Infrastructure** - Provision actual cloud resources on AWS, Azure, or GCP  
+🏗️ **RAG Applications** - Set up AI-powered applications with vector databases
+📊 **ML Workloads** - Configure GPU instances and ML frameworks
+🗄️ **Databases** - Deploy PostgreSQL, MySQL, or vector databases
+
+Just describe what you want to deploy and I'll generate the Infrastructure as Code for you to review before deployment!
+
+**Example:** "Deploy a RAG application with vector database on AWS"`;
   }
   
-  if (input_lower.includes('web app') || input_lower.includes('website') || input_lower.includes('frontend')) {
-    return {
-      content: "Perfect! I'll set up a production-ready web application deployment for you. Based on your requirements, I'm configuring:\n\n✅ **Server**: Ubuntu 22.04 with Nginx + SSL\n✅ **Resources**: 4 CPU cores, 8GB RAM\n✅ **Storage**: 50GB SSD with backup\n✅ **Features**: Auto-scaling, load balancing, CDN\n✅ **Security**: Firewall, SSL certificates\n✅ **Region**: US-East (optimized for performance)\n\n💰 **Estimated cost**: $89-127/month depending on provider\n\nReady to deploy? I'll show you the configuration preview next where you can choose your cloud provider and review all settings before deployment.",
-      config: {
-        os: 'Ubuntu 22.04 LTS',
-        cpu: '4 cores',
-        ram: '8GB',
-        storage: '50GB SSD',
-        region: 'US-East-1',
-        type: 'web-application'
-      }
-    };
-  } else if (input_lower.includes('ml') || input_lower.includes('machine learning') || input_lower.includes('gpu') || input_lower.includes('ai')) {
-    return {
-      content: "Excellent! I'm configuring a high-performance ML environment with real GPU support:\n\n🚀 **Compute**: 8 CPU cores + NVIDIA GPU (A10G/V100)\n🧠 **Memory**: 32GB RAM + 16GB GPU memory\n💾 **Storage**: 200GB NVMe SSD + 1TB data volume\n🐍 **ML Stack**: Python 3.11, PyTorch, TensorFlow, CUDA 12\n📊 **Tools**: Jupyter Lab, MLflow, Weights & Biases\n🔒 **Security**: VPC, SSH key access, encrypted storage\n\n💰 **Estimated cost**: $342-450/month for GPU instance\n\nThis includes everything you need for model training, inference, and experiment tracking. Ready to proceed?",
-      config: {
-        os: 'Ubuntu 22.04 LTS',
-        cpu: '8 cores + GPU',
-        ram: '32GB',
-        storage: '200GB SSD + 1TB',
-        region: 'US-West-2',
-        type: 'machine-learning'
-      }
-    };
-  } else if (input_lower.includes('database') || input_lower.includes('db') || input_lower.includes('postgres') || input_lower.includes('mysql')) {
-    return {
-      content: "Great choice! I'm setting up a production-grade database cluster:\n\n🗄️ **Database**: PostgreSQL 15 (or your preferred engine)\n⚡ **Performance**: 4 CPU cores, 16GB RAM, optimized SSD\n🔄 **High Availability**: Multi-AZ deployment with failover\n💾 **Backup**: Automated daily backups, 30-day retention\n📊 **Monitoring**: Performance insights, alerting\n🔒 **Security**: Encryption at rest/transit, VPC isolation\n🌐 **Scaling**: Read replicas, connection pooling\n\n💰 **Estimated cost**: $156-210/month with HA\n\nIncludes monitoring dashboard and automated maintenance. Should I proceed with this configuration?",
-      config: {
-        os: 'Ubuntu 22.04 LTS',
-        cpu: '4 cores',
-        ram: '16GB',
-        storage: '100GB SSD + Backup',
-        region: 'US-East-1',
-        type: 'database'
-      }
-    };
-  } else if (input_lower.includes('api') || input_lower.includes('backend') || input_lower.includes('microservice')) {
-    return {
-      content: "Perfect for API development! I'm configuring a scalable backend infrastructure:\n\n🔧 **Runtime**: Node.js/Python with containerization\n📦 **Container**: Docker + Kubernetes orchestration\n⚡ **Resources**: 2-8 CPU cores (auto-scaling)\n💾 **Memory**: 4-16GB RAM (elastic)\n🌐 **Network**: Load balancer, API gateway\n📊 **Monitoring**: APM, logging, metrics\n🔄 **CI/CD**: Automated deployment pipeline\n\n💰 **Estimated cost**: $67-134/month (scales with usage)\n\nIncludes SSL, monitoring, and automatic scaling. Ready to deploy your API?",
-      config: {
-        os: 'Container (Ubuntu base)',
-        cpu: '2-8 cores (auto-scale)',
-        ram: '4-16GB (elastic)',
-        storage: '50GB SSD',
-        region: 'US-East-1',
-        type: 'api-backend'
-      }
-    };
-  } else {
-    return {
-      content: "I'd be happy to help you deploy that! To give you the best configuration, could you provide more details?\n\n🎯 **What type of application?**\n• Web application (React, Vue, static site)\n• API/Backend service (Node.js, Python, Go)\n• Database (PostgreSQL, MySQL, MongoDB)\n• ML/AI workload (training, inference)\n• Container application (Docker, Kubernetes)\n\n📊 **What's your expected usage?**\n• Small project (< 1000 users)\n• Growing startup (1K-10K users)\n• Production app (10K+ users)\n\n🌍 **Any specific requirements?**\n• Preferred cloud provider (AWS, Azure, GCP)\n• Specific region\n• Budget constraints\n• Compliance needs\n\nThe more details you provide, the better I can optimize your infrastructure!",
-      config: null
-    };
-  }
-}
+  return `👋 **Welcome to the AI Infrastructure Assistant!**
 
-export function getWelcomeMessage(credentialsValid: boolean): string {
-  return credentialsValid 
-    ? "🎉 Great! Your credentials are configured. I can now deploy real infrastructure for you. Tell me what you'd like to deploy:\n\n• 'Deploy a web application with auto-scaling on AWS'\n• 'I need a machine learning pipeline with GPU support'\n• 'Set up a database cluster with backup and monitoring'\n\nWhat would you like to deploy today?"
-    : "Hello! I'm your AI deployment assistant. To deploy real infrastructure, you'll need to configure your cloud provider credentials first. Once configured, I can help you deploy applications, ML pipelines, databases, and more.\n\nPlease set up your credentials in the panel above to get started.";
-}
+I can help you generate Infrastructure as Code and deploy real cloud infrastructure, but first you'll need to configure your cloud provider credentials above.
+
+Once configured, I can:
+- Generate Pulumi and Terraform code
+- Deploy to AWS, Azure, or GCP
+- Create RAG applications with vector databases
+- Set up ML environments with GPU support
+
+Please configure your credentials above to get started with real deployments!`;
+};
