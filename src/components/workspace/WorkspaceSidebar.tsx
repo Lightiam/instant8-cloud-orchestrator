@@ -7,7 +7,8 @@ import {
   Settings, 
   FileText,
   Database,
-  Activity
+  Activity,
+  Key
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -28,6 +29,7 @@ const items = [
   { title: 'History', url: '/workspace/history', icon: History },
   { title: 'Databases', url: '/workspace/databases', icon: Database },
   { title: 'Analytics', url: '/workspace/analytics', icon: Activity },
+  { title: 'Environment', url: '/workspace/environment', icon: Key },
   { title: 'Documentation', url: '/workspace/docs', icon: FileText },
   { title: 'Settings', url: '/workspace/settings', icon: Settings },
 ];

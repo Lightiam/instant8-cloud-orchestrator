@@ -8,6 +8,7 @@ import { DatabaseManagement } from './DatabaseManagement';
 import { Analytics } from './Analytics';
 import { Documentation } from './Documentation';
 import { WorkspaceSettings } from './WorkspaceSettings';
+import { EnvironmentVariables } from './EnvironmentVariables';
 
 export function WorkspaceContent() {
   return (
@@ -18,6 +19,7 @@ export function WorkspaceContent() {
         <Route path="/history" element={<DeploymentHistory />} />
         <Route path="/databases" element={<DatabaseManagement />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/environment" element={<EnvironmentVariables />} />
         <Route path="/docs" element={<Documentation />} />
         <Route path="/settings" element={<WorkspaceSettings />} />
         <Route index element={<DeploymentDashboard />} />

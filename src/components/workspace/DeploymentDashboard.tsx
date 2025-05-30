@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, MessageSquare } from 'lucide-react';
+import { Plus, MessageSquare, Key } from 'lucide-react';
 import { RAGConfigPreview } from './RAGConfigPreview';
 import { DeploymentProgress } from './DeploymentProgress';
 import { ChatDeploymentInterface } from '../deployment/ChatDeploymentInterface';
 import { IaCCodePreview } from '../deployment/IaCCodePreview';
-import { CredentialsSetup } from '../deployment/CredentialsSetup';
 import { DeploymentStats } from './DeploymentStats';
 import { QuickTemplates } from './QuickTemplates';
 import { RecentActivity } from './RecentActivity';
 import { FeaturesBanner } from './FeaturesBanner';
 import { CompletedDeployment } from './CompletedDeployment';
 import { DeploymentConfig } from '@/services/deploymentService';
+import { hasValidCredentials } from '@/utils/environmentUtils';
 
 type DeploymentStep = 'credentials' | 'chat' | 'iac-preview' | 'preview' | 'deploying' | 'completed';
 
@@ -75,6 +75,14 @@ export function DeploymentDashboard() {
     setSelectedProvider('');
   };
 
+  React.useEffect(() => {
+    const isValid = hasValidCredentials();
+    setCredentialsValid(isValid);
+    if (isValid && currentStep === 'credentials') {
+      setCurrentStep('chat');
+    }
+  }, [currentStep]);
+
   if (currentStep === 'iac-preview') {
     return (
       <IaCCodePreview 
@@ -122,7 +130,7 @@ export function DeploymentDashboard() {
           <p className="text-gray-600 mt-2">
             {credentialsValid 
               ? "Describe your infrastructure needs and get ready-to-deploy IaC code"
-              : "Set up your credentials to start generating Infrastructure as Code"
+              : "Configure your credentials in Environment Variables to start generating Infrastructure as Code"
             }
           </p>
         </div>
@@ -139,10 +147,28 @@ export function DeploymentDashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Credentials Setup - Always show at top */}
-          <CredentialsSetup onCredentialsSet={handleCredentialsSet} />
+          {!credentialsValid && (
+            <Card className="border-orange-200 bg-orange-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-800">
+                  <Key className="h-5 w-5" />
+                  Credentials Required
+                </CardTitle>
+                <CardDescription className="text-orange-700">
+                  Set up your cloud provider credentials to enable Infrastructure as Code generation.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => window.location.href = '/workspace/environment'}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  Configure Environment Variables
+                </Button>
+              </CardContent>
+            </Card>
+          )}
           
-          {/* Chat Interface - Show when credentials are valid or user is in chat step */}
           {(credentialsValid || currentStep === 'chat') && (
             <Card className="shadow-lg border-0">
               <CardHeader>
@@ -155,7 +181,7 @@ export function DeploymentDashboard() {
                     <CardDescription>
                       {credentialsValid 
                         ? "Describe your infrastructure needs and get Infrastructure as Code"
-                        : "Configure credentials above to enable IaC generation"
+                        : "Configure credentials in Environment Variables to enable IaC generation"
                       }
                     </CardDescription>
                   </div>
