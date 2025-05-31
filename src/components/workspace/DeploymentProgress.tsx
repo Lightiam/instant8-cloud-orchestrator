@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DeploymentProgressHeader } from './DeploymentProgressHeader';
 import { DeploymentProgressOverview } from './DeploymentProgressOverview';
@@ -49,12 +48,15 @@ export function DeploymentProgress({ provider, onComplete, onCancel }: Deploymen
     setIsDeploying(true);
     
     try {
-      // Validate that we have a supported provider
+      // Normalize and validate provider
+      const normalizedProvider = provider.toLowerCase().trim();
       const supportedProviders = ['azure', 'aws', 'gcp'];
-      const normalizedProvider = provider.toLowerCase();
       
+      // Ensure we have a valid provider
+      let validProvider = normalizedProvider;
       if (!supportedProviders.includes(normalizedProvider)) {
-        throw new Error(`Unsupported provider: ${provider}. Supported providers are: ${supportedProviders.join(', ')}`);
+        console.warn(`⚠️ Invalid provider "${provider}", defaulting to Azure`);
+        validProvider = 'azure';
       }
 
       // Create deployment configuration
@@ -67,12 +69,12 @@ export function DeploymentProgress({ provider, onComplete, onCancel }: Deploymen
         type: 'web-application'
       };
 
-      // Start the real deployment
-      console.log(`📋 Deploying to ${normalizedProvider} with config:`, config);
-      toast.info(`Starting deployment to ${normalizedProvider.toUpperCase()}...`);
+      // Start the real deployment with validated provider
+      console.log(`📋 Deploying to ${validProvider} with config:`, config);
+      toast.info(`Starting deployment to ${validProvider.toUpperCase()}...`);
       
       // Update steps as deployment progresses
-      const deploymentPromise = deploymentService.deployToProvider(config, normalizedProvider);
+      const deploymentPromise = deploymentService.deployToProvider(config, validProvider);
       
       // Simulate step progression while deployment runs
       const stepTimer = setInterval(() => {
@@ -107,7 +109,7 @@ export function DeploymentProgress({ provider, onComplete, onCancel }: Deploymen
         setSteps(prevSteps => 
           prevSteps.map(step => ({ ...step, status: 'completed' }))
         );
-        toast.success(`Successfully deployed to ${normalizedProvider.toUpperCase()}!`);
+        toast.success(`Successfully deployed to ${validProvider.toUpperCase()}!`);
         setTimeout(() => onComplete(), 1000);
       } else {
         console.error('❌ Real deployment failed:', result.error);
@@ -118,7 +120,7 @@ export function DeploymentProgress({ provider, onComplete, onCancel }: Deploymen
             status: index <= currentStep ? 'error' : 'pending'
           }))
         );
-        toast.error(`Deployment to ${normalizedProvider.toUpperCase()} failed: ${result.error}`);
+        toast.error(`Deployment to ${validProvider.toUpperCase()} failed: ${result.error}`);
       }
     } catch (error) {
       console.error('❌ Deployment error:', error);

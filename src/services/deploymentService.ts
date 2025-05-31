@@ -47,16 +47,30 @@ class DeploymentService {
       logs.push(`🔐 Token-based authentication validated for ${provider.toUpperCase()}`);
       console.log(`✅ Credentials validated for ${provider}`);
       
-      const lowerProvider = provider.toLowerCase();
+      // Normalize provider name and validate
+      const lowerProvider = provider.toLowerCase().trim();
       
-      if (lowerProvider === 'azure') {
+      // Map any alternative provider names to standard ones
+      let normalizedProvider = lowerProvider;
+      if (lowerProvider === 'pulumi' || lowerProvider === 'terraform') {
+        // Default to Azure if pulumi/terraform is passed without specific provider
+        normalizedProvider = 'azure';
+        console.log(`⚠️ Provider "${provider}" detected, defaulting to Azure deployment`);
+      }
+      
+      const supportedProviders = ['azure', 'aws', 'gcp'];
+      if (!supportedProviders.includes(normalizedProvider)) {
+        throw new Error(`Unsupported provider: ${provider}. Supported providers are: ${supportedProviders.join(', ')}`);
+      }
+      
+      if (normalizedProvider === 'azure') {
         return await azureDeploymentService.deploy(config, deploymentId, logs);
-      } else if (lowerProvider === 'aws') {
+      } else if (normalizedProvider === 'aws') {
         return await awsDeploymentService.deploy(config, deploymentId, logs);
-      } else if (lowerProvider === 'gcp') {
+      } else if (normalizedProvider === 'gcp') {
         return await gcpDeploymentService.deploy(config, deploymentId, logs);
       } else {
-        throw new Error(`Unsupported provider: ${provider}`);
+        throw new Error(`Unsupported provider: ${normalizedProvider}`);
       }
 
     } catch (error) {
