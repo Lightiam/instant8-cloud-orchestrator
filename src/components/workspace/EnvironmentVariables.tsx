@@ -97,7 +97,7 @@ export function EnvironmentVariables() {
   const azureRequiredVars = [
     { key: 'AZURE_SUBSCRIPTION_ID', description: 'Azure Subscription ID' },
     { key: 'AZURE_SECRET_KEY', description: 'Azure authentication secret key' },
-    { key: 'AZURE_ENDPOINT', description: 'Azure service endpoint URL' }
+    { key: 'AZURE_ENDPOINT', description: 'Azure service endpoint URL (e.g., https://yourservice.openai.azure.com/)' }
   ];
 
   return (
