@@ -19,8 +19,9 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
     
     const subscriptionId = formData.get('subscriptionId') as string;
     const secretKey = formData.get('secretKey') as string;
+    const endpoint = formData.get('endpoint') as string;
     
-    if (!subscriptionId || !secretKey) {
+    if (!subscriptionId || !secretKey || !endpoint) {
       return;
     }
     
@@ -29,6 +30,7 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
       azure: {
         subscriptionId,
         secretKey,
+        endpoint,
         useDefaultCredential: true
       }
     };
@@ -41,10 +43,10 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
         <div className="flex items-center gap-2 text-blue-800 mb-2">
           <Shield className="h-4 w-4" />
-          <span className="text-sm font-medium">Azure Best Practices Enabled</span>
+          <span className="text-sm font-medium">Azure Configuration</span>
         </div>
         <p className="text-xs text-blue-700">
-          Using Azure's recommended token-based authentication with DefaultAzureCredential.
+          Configure your Azure credentials and endpoint for deployment.
         </p>
       </div>
       
@@ -73,6 +75,19 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
           />
           <p className="text-xs text-gray-500">
             Your Azure authentication secret key
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="endpoint">Azure Endpoint *</Label>
+          <Input
+            id="endpoint"
+            name="endpoint"
+            placeholder="https://lightiam.openai.azure.com/"
+            required
+          />
+          <p className="text-xs text-gray-500">
+            Your Azure service endpoint URL
           </p>
         </div>
         

@@ -2,21 +2,14 @@
 import { DefaultAzureCredential, ClientSecretCredential } from '@azure/identity';
 
 export interface AuthCredentials {
-  pulumi?: {
-    accessToken: string;
-  };
   azure?: {
     subscriptionId: string;
     secretKey?: string;
+    endpoint?: string;
     tenantId?: string;
     useDefaultCredential?: boolean;
     clientId?: string;
     clientSecret?: string;
-  };
-  aws?: {
-    accessKeyId: string;
-    secretAccessKey: string;
-    region: string;
   };
 }
 
@@ -25,7 +18,7 @@ class AuthenticationService {
 
   setCredentials(credentials: AuthCredentials) {
     this.credentials = credentials;
-    console.log('Authentication credentials configured for:', Object.keys(credentials));
+    console.log('Authentication credentials configured for Azure');
   }
 
   getCredentials(): AuthCredentials {
@@ -45,31 +38,19 @@ class AuthenticationService {
   }
 
   async validateCredentials(): Promise<boolean> {
-    console.log('🔐 Validating cloud provider credentials using Azure best practices...');
+    console.log('🔐 Validating Azure credentials...');
     
     try {
       if (this.credentials.azure) {
-        const { subscriptionId, secretKey } = this.credentials.azure;
+        const { subscriptionId, secretKey, endpoint } = this.credentials.azure;
         console.log('📋 Validating Azure credentials with secret key authentication...');
         
-        if (!subscriptionId || !secretKey) {
-          console.error('❌ Azure subscription ID and secret key are required');
+        if (!subscriptionId || !secretKey || !endpoint) {
+          console.error('❌ Azure subscription ID, secret key, and endpoint are required');
           return false;
         }
 
         console.log('✅ Azure credentials validated successfully');
-      }
-      
-      if (this.credentials.aws) {
-        const { accessKeyId, secretAccessKey, region } = this.credentials.aws;
-        console.log('📋 Validating AWS credentials...');
-        
-        if (!accessKeyId || !secretAccessKey) {
-          console.error('❌ AWS access keys are required');
-          return false;
-        }
-        
-        console.log('✅ AWS credentials validated');
       }
       
       return true;
