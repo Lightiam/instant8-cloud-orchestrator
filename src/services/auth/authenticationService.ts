@@ -18,17 +18,28 @@ class AuthenticationService {
 
   setCredentials(credentials: AuthCredentials) {
     this.credentials = credentials;
-    console.log('✅ Authentication credentials set for Azure');
+    console.log('✅ Authentication credentials set for Azure:', {
+      hasAzure: !!credentials.azure,
+      hasSubscriptionId: !!credentials.azure?.subscriptionId,
+      hasSecretKey: !!credentials.azure?.secretKey,
+      hasEndpoint: !!credentials.azure?.endpoint
+    });
   }
 
   getCredentials(): AuthCredentials {
+    console.log('🔍 Getting credentials - checking existing:', {
+      hasExistingCredentials: !!this.credentials.azure,
+      credentialsKeys: this.credentials.azure ? Object.keys(this.credentials.azure) : []
+    });
+    
     // If credentials are already set, use them
     if (this.credentials.azure) {
-      console.log('Using already configured credentials');
+      console.log('✅ Using already configured credentials');
       return this.credentials;
     }
     
     // Only load from environment if no credentials are set
+    console.log('⚠️ No credentials set, attempting to load from environment...');
     this.loadCredentialsFromEnvironment();
     return this.credentials;
   }
@@ -77,16 +88,33 @@ class AuthenticationService {
   }
 
   async validateCredentials(): Promise<boolean> {
-    console.log('🔐 Validating Azure credentials...');
+    console.log('🔐 Starting credential validation...');
     
     try {
       const credentials = this.getCredentials();
+      console.log('📋 Retrieved credentials for validation:', {
+        hasAzure: !!credentials.azure,
+        azureCredentials: credentials.azure ? {
+          hasSubscriptionId: !!credentials.azure.subscriptionId,
+          hasSecretKey: !!credentials.azure.secretKey,
+          hasEndpoint: !!credentials.azure.endpoint,
+          subscriptionIdLength: credentials.azure.subscriptionId?.length || 0,
+          secretKeyLength: credentials.azure.secretKey?.length || 0,
+          endpointValue: credentials.azure.endpoint
+        } : null
+      });
+      
       if (credentials.azure) {
         const { subscriptionId, secretKey, endpoint } = credentials.azure;
         console.log('📋 Validating Azure credentials...');
         
         if (!subscriptionId || !secretKey || !endpoint) {
           console.error('❌ Azure subscription ID, secret key, and endpoint are required');
+          console.error('❌ Validation failed - missing required fields:', {
+            missingSubscriptionId: !subscriptionId,
+            missingSecretKey: !secretKey,
+            missingEndpoint: !endpoint
+          });
           return false;
         }
 
@@ -94,7 +122,7 @@ class AuthenticationService {
         return true;
       }
       
-      console.error('❌ No Azure credentials found');
+      console.error('❌ No Azure credentials found during validation');
       return false;
     } catch (error) {
       console.error('❌ Credential validation failed:', error);
