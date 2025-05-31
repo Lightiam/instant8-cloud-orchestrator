@@ -1,4 +1,3 @@
-
 import { authenticationService, AuthCredentials } from './auth/authenticationService';
 import { azureDeploymentService } from './providers/azureDeploymentService';
 import { awsDeploymentService } from './providers/awsDeploymentService';
@@ -49,8 +48,7 @@ class DeploymentService {
     const logs: string[] = [];
 
     try {
-      // Force refresh credentials before validation
-      console.log('🔄 Refreshing credentials before deployment...');
+      console.log('🔐 Validating credentials for deployment...');
       
       const credentialsValid = await this.validateCredentials();
       if (!credentialsValid) {
