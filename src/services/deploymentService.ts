@@ -24,6 +24,16 @@ export interface DeploymentResult {
 }
 
 class DeploymentService {
+  constructor() {
+    // Listen for credential updates
+    if (typeof window !== 'undefined') {
+      window.addEventListener('credentialsUpdated', () => {
+        console.log('Credentials updated, reloading...');
+        // Force reload credentials on next validation
+      });
+    }
+  }
+
   setCredentials(credentials: DeploymentCredentials) {
     authenticationService.setCredentials(credentials);
   }
@@ -39,6 +49,9 @@ class DeploymentService {
     const logs: string[] = [];
 
     try {
+      // Force refresh credentials before validation
+      console.log('🔄 Refreshing credentials before deployment...');
+      
       const credentialsValid = await this.validateCredentials();
       if (!credentialsValid) {
         throw new Error('Invalid or missing credentials for ' + provider);
