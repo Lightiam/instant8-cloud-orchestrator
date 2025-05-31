@@ -18,8 +18,9 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
     const formData = new FormData(e.currentTarget);
     
     const subscriptionId = formData.get('subscriptionId') as string;
+    const secretKey = formData.get('secretKey') as string;
     
-    if (!subscriptionId) {
+    if (!subscriptionId || !secretKey) {
       return;
     }
     
@@ -27,6 +28,7 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
       ...credentials,
       azure: {
         subscriptionId,
+        secretKey,
         useDefaultCredential: true
       }
     };
@@ -56,7 +58,21 @@ export function AzureCredentialsForm({ credentials, isValidating, onSubmit }: Az
             required
           />
           <p className="text-xs text-gray-500">
-            Your Azure subscription identifier (Key)
+            Your Azure subscription identifier
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="secretKey">Secret Key *</Label>
+          <Input
+            id="secretKey"
+            name="secretKey"
+            type="password"
+            placeholder="Enter your Azure secret key"
+            required
+          />
+          <p className="text-xs text-gray-500">
+            Your Azure authentication secret key
           </p>
         </div>
         

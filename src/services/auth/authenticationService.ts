@@ -7,6 +7,7 @@ export interface AuthCredentials {
   };
   azure?: {
     subscriptionId: string;
+    secretKey?: string;
     tenantId?: string;
     useDefaultCredential?: boolean;
     clientId?: string;
@@ -48,15 +49,15 @@ class AuthenticationService {
     
     try {
       if (this.credentials.azure) {
-        const { subscriptionId } = this.credentials.azure;
-        console.log('📋 Validating Azure credentials with token-based authentication...');
+        const { subscriptionId, secretKey } = this.credentials.azure;
+        console.log('📋 Validating Azure credentials with secret key authentication...');
         
-        if (!subscriptionId) {
-          console.error('❌ Azure subscription ID is required');
+        if (!subscriptionId || !secretKey) {
+          console.error('❌ Azure subscription ID and secret key are required');
           return false;
         }
 
-        console.log('✅ Azure token-based authentication validated successfully');
+        console.log('✅ Azure credentials validated successfully');
       }
       
       if (this.credentials.aws) {
