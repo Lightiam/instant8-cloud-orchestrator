@@ -7,7 +7,7 @@ export interface AuthCredentials {
   };
   azure?: {
     subscriptionId: string;
-    tenantId: string;
+    tenantId?: string;
     useDefaultCredential?: boolean;
     clientId?: string;
     clientSecret?: string;
@@ -37,22 +37,9 @@ class AuthenticationService {
       throw new Error('Azure credentials not configured');
     }
 
-    let credential;
-    
-    if (azureCredentials.useDefaultCredential) {
-      credential = new DefaultAzureCredential();
-      console.log('✅ Using DefaultAzureCredential for Azure authentication');
-    } else if (azureCredentials.clientId && azureCredentials.clientSecret && azureCredentials.tenantId) {
-      credential = new ClientSecretCredential(
-        azureCredentials.tenantId,
-        azureCredentials.clientId,
-        azureCredentials.clientSecret
-      );
-      console.log('✅ Using ClientSecretCredential for Azure authentication');
-    } else {
-      throw new Error('Azure credentials incomplete. Either enable DefaultAzureCredential or provide clientId, clientSecret, and tenantId');
-    }
-
+    // Always use DefaultAzureCredential when only subscription ID is provided
+    const credential = new DefaultAzureCredential();
+    console.log('✅ Using DefaultAzureCredential for Azure authentication');
     return credential;
   }
 
@@ -61,11 +48,11 @@ class AuthenticationService {
     
     try {
       if (this.credentials.azure) {
-        const { subscriptionId, tenantId } = this.credentials.azure;
+        const { subscriptionId } = this.credentials.azure;
         console.log('📋 Validating Azure credentials with token-based authentication...');
         
-        if (!subscriptionId || !tenantId) {
-          console.error('❌ Azure subscription ID and tenant ID are required');
+        if (!subscriptionId) {
+          console.error('❌ Azure subscription ID is required');
           return false;
         }
 
