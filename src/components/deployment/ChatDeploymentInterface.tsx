@@ -104,9 +104,9 @@ export function ChatDeploymentInterface({ onConfigGenerated, credentialsValid }:
   return (
     <Card className="h-[600px] flex flex-col">
       <CardContent className="flex-1 flex flex-col p-0">
-        {/* Chat Messages */}
+        {/* Chat Messages - with proper bottom padding to avoid overlap */}
         <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-          <div className="space-y-4">
+          <div className="space-y-4 pb-20">
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
@@ -114,16 +114,20 @@ export function ChatDeploymentInterface({ onConfigGenerated, credentialsValid }:
           </div>
         </ScrollArea>
 
-        {/* Chat Input */}
-        <ChatInput
-          value={input}
-          onChange={setInput}
-          onSend={handleSend}
-          onKeyPress={handleKeyPress}
-          disabled={isTyping || !credentialsValid}
-          credentialsValid={credentialsValid}
-        />
-        <ChatStatusIndicator credentialsValid={credentialsValid} />
+        {/* Chat Input - positioned at bottom */}
+        <div className="border-t bg-white">
+          <ChatInput
+            value={input}
+            onChange={setInput}
+            onSend={handleSend}
+            onKeyPress={handleKeyPress}
+            disabled={isTyping || !credentialsValid}
+            credentialsValid={credentialsValid}
+          />
+          <div className="px-4 pb-2">
+            <ChatStatusIndicator credentialsValid={credentialsValid} />
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
