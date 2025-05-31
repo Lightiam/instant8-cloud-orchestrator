@@ -1,10 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ProviderTemplates } from './ProviderTemplates';
 import { EnvironmentVariableForm } from './EnvironmentVariableForm';
 import { EnvironmentVariablesList } from './EnvironmentVariablesList';
 
@@ -18,7 +16,7 @@ export function EnvironmentVariables() {
   const { toast } = useToast();
   const [envVars, setEnvVars] = useState<EnvVariable[]>([]);
   const [showValues, setShowValues] = useState<Record<string, boolean>>({});
-  const [newVar, setNewVar] = useState({ key: '', value: '', provider: 'aws' });
+  const [newVar, setNewVar] = useState({ key: '', value: '', provider: 'azure' });
 
   // Load environment variables from localStorage on mount
   useEffect(() => {
@@ -55,7 +53,7 @@ export function EnvironmentVariables() {
     if (exists) {
       toast({
         title: "Error", 
-        description: "This environment variable already exists for this provider",
+        description: "This environment variable already exists",
         variant: "destructive"
       });
       return;
@@ -63,7 +61,7 @@ export function EnvironmentVariables() {
 
     const updated = [...envVars, { ...newVar }];
     saveEnvVars(updated);
-    setNewVar({ key: '', value: '', provider: 'aws' });
+    setNewVar({ key: '', value: '', provider: 'azure' });
     
     toast({
       title: "Success",
@@ -88,10 +86,6 @@ export function EnvironmentVariables() {
     }));
   };
 
-  const handleTemplateSelect = (key: string, provider: string) => {
-    setNewVar({ ...newVar, key, provider });
-  };
-
   const handleKeyChange = (key: string) => {
     setNewVar({ ...newVar, key });
   };
@@ -100,80 +94,63 @@ export function EnvironmentVariables() {
     setNewVar({ ...newVar, value });
   };
 
-  const providerTemplates = {
-    aws: [
-      { key: 'AWS_ACCESS_KEY_ID', description: 'Your AWS Access Key ID' },
-      { key: 'AWS_SECRET_ACCESS_KEY', description: 'Your AWS Secret Access Key' },
-      { key: 'AWS_REGION', description: 'Default AWS region (e.g., us-east-1)' }
-    ],
-    azure: [
-      { key: 'AZURE_CLIENT_ID', description: 'Azure Application (client) ID' },
-      { key: 'AZURE_CLIENT_SECRET', description: 'Azure Client Secret' },
-      { key: 'AZURE_TENANT_ID', description: 'Azure Directory (tenant) ID' },
-      { key: 'AZURE_SUBSCRIPTION_ID', description: 'Azure Subscription ID' }
-    ],
-    gcp: [
-      { key: 'GOOGLE_CREDENTIALS', description: 'Google Cloud service account JSON' },
-      { key: 'GOOGLE_PROJECT', description: 'Google Cloud Project ID' },
-      { key: 'GOOGLE_REGION', description: 'Default Google Cloud region' }
-    ]
-  };
+  const azureRequiredVars = [
+    { key: 'AZURE_SUBSCRIPTION_ID', description: 'Azure Subscription ID' },
+    { key: 'AZURE_SECRET_KEY', description: 'Azure authentication secret key' },
+    { key: 'AZURE_ENDPOINT', description: 'Azure service endpoint URL' }
+  ];
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Environment Variables</h2>
         <p className="text-gray-600 mt-2">
-          Configure your cloud provider credentials and other environment variables
+          Configure your Azure credentials for deployment
         </p>
       </div>
 
-      <Tabs defaultValue="aws" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="aws">AWS</TabsTrigger>
-          <TabsTrigger value="azure">Azure</TabsTrigger>
-          <TabsTrigger value="gcp">Google Cloud</TabsTrigger>
-        </TabsList>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Key className="h-5 w-5" />
+            Azure Configuration
+          </CardTitle>
+          <CardDescription>
+            Set up your Azure credentials for Infrastructure as Code deployment
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Required Variables:</label>
+            <div className="grid gap-2">
+              {azureRequiredVars.map((template) => (
+                <div key={template.key} className="flex items-center justify-between p-2 border rounded">
+                  <div>
+                    <code className="text-sm bg-gray-100 px-1 rounded">{template.key}</code>
+                    <p className="text-xs text-gray-600 mt-1">{template.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        {Object.entries(providerTemplates).map(([provider, templates]) => (
-          <TabsContent key={provider} value={provider} className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5" />
-                  {provider.toUpperCase()} Configuration
-                </CardTitle>
-                <CardDescription>
-                  Set up your {provider.toUpperCase()} credentials for Infrastructure as Code deployment
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ProviderTemplates 
-                  provider={provider}
-                  templates={templates}
-                  onTemplateSelect={handleTemplateSelect}
-                />
+          <EnvironmentVariableForm
+            newVar={newVar}
+            provider="azure"
+            onKeyChange={handleKeyChange}
+            onValueChange={handleValueChange}
+            onSubmit={addEnvVar}
+          />
 
-                <EnvironmentVariableForm
-                  newVar={newVar}
-                  provider={provider}
-                  onKeyChange={handleKeyChange}
-                  onValueChange={handleValueChange}
-                  onSubmit={addEnvVar}
-                />
-
-                <EnvironmentVariablesList
-                  envVars={envVars}
-                  provider={provider}
-                  showValues={showValues}
-                  onToggleShow={toggleShowValue}
-                  onDelete={deleteEnvVar}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        ))}
-      </Tabs>
+          <EnvironmentVariablesList
+            envVars={envVars}
+            provider="azure"
+            showValues={showValues}
+            onToggleShow={toggleShowValue}
+            onDelete={deleteEnvVar}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
